@@ -1,0 +1,20 @@
+{
+    "name":"MesManuels&Moi",
+    "short_name":"MesManuels&Moi",
+    "start_url":"index.html",
+    "display":"standalone",
+    "background_color":"#e20037",
+    "theme_color":"black",
+    "scope": ".",
+    "categories": [
+      "education"
+    ],
+    "description":"Tous vos manuels dans votre poche ;)",
+    "icons":[
+    {
+    "src":"assets/img/1024x1024.png",                     
+    "sizes":"1024x1024",
+    "type":"image/png"
+    }
+  ]
+  }

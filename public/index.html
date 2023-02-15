@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <title>MesManuels&Moi</title>
+
+    <!-- Encodage -->
+    <meta charset='utf-8'>
+
+    <!-- Compatibility -->
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <!-- ASSETS -->
+    <link rel="icon" type="image/png" href="./assets/img/logo.png" />
+    <script src="https://kit.fontawesome.com/7b3b8d0b5f.js" crossorigin="anonymous"></script>
+
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="./assets/img/1024x1024.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="./assets/img/1024x1024.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/img/1024x1024.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="./assets/img/1024x1024.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="MesManuels&Moi">
+    <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
+</head>
+<body>
+    
+    
+    <header>
+        <a href="https://lyceeconnecte.fr" target="_blank">
+        <img src="./assets/img/na.png" style="
+        width: 200px;
+    " alt="" srcset=""></a>
+    <div class="navbar-plus">
+        <a href="https://notionforms.io/forms/ajouter-un-manuel" style="
+        color: #f2f2f2;" target="_blank">
+            <i class="fas fa-plus">+</i></a></div>
+    <br>
+    </header>
+<main>
+    <center>
+        <h2>Mes Manuels & Moi:<br></h2>
+        <h3 class="info">Votre établissement et votre classe:</h3>
+        
+        <select onchange="saveLycee()" id="lycee" name="lycee">
+            <option id="none" value="none">Choisir un lycée</option>
+            <option id="1-lycee" value="1">Lycée d'état Victor Duruy — Mont de Marsan</option>
+            <option id="2-lycee" value="2">Lycée Test — Test</option>
+        </select>
+
+        <select onchange="saveClasse()" id="classe" name="classe">
+            <option id="noneclass" value="noneclass">Choisir une classe</option>
+            <option id="0-class" value="0">Terminale</option>
+            <option id="1-class" value="1">Première</option>
+            <option id="2-class" value="2">Seconde</option>
+        </select>
+        <h2 style="text-decoration: underline;">Accès au manuels de votre classe</h2>
+      <br>
+
+     
+    
+  <div id="grid-manuels" class="grid-container">
+    
+</div> 
+<br>
+<a href="assets/mentionslegales.pdf">Mentions Légales & Politique de confidentialité</a>
+</center>
+</main>
+
+
+<script>
+
+//Setup service Worker
+if('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./serviceworker.js')
+                    .then((reg) => console.log('Success: ', reg.scope))
+                    .catch((err) => console.log('Failure: ', err));
+            })
+        }
+
+    //Verifie si le navigateur supporte le stockage local
+    if(window.localStorage){
+        console.log("Stockage supporté ;-)")
+      }else{
+        console.log("Stockage non supporté :-(")
+      }
+      
+      const div = document.querySelector("#grid-manuels");
+
+      console.log("Lycée: "+localStorage.getItem("lycee"));
+        console.log("Classe: "+localStorage.getItem("classe"));
+      if(localStorage.getItem("lycee") == null){
+        
+        div.innerHTML = "Vous n'avez pas sélectionner de lycée"
+      }else if(localStorage.getItem("lycee") == "none"){
+        div.innerHTML = "Vous n'avez pas sélectionner de classe"
+      }else if(localStorage.getItem("classe") == null){
+        div.innerHTML = "Vous n'avez pas sélectionner de classe"
+      }else if(localStorage.getItem("classe") == "noneclass"){
+        div.innerHTML = "Vous n'avez pas sélectionner de classe"
+      }else{
+        
+      fetch("assets/manuels.json")
+          .then(res => res.json())
+          .then(data => {
+            
+            const manuels = data[localStorage.getItem("lycee")][localStorage.getItem("classe")]["manuels"];
+            if(manuels.length == 0){
+        div.innerHTML = "Vous n'avez pas de manuels ajoutés à votre classe"
+            
+            }else{
+          
+          for (let i = 0; i < manuels.length; i++) {
+                   div.innerHTML += `
+                   
+             <div class="grid-item">
+                 ${manuels[i].name}
+                 <br>
+                 <br>
+                 <img style="width: 260px;" src="${manuels[i].image}" alt="" srcset="">
+                 <br>
+                 <a target="_blank" href="${manuels[i].link}">Accéder au manuel</a>
+             </div>
+                   `;
+          }
+      
+        }
+            }
+            )}
+      
+      ////////////LYCEE/////////////////////
+      //Renvoie si le navigateur à une entrée "lycee" dans le stockage local
+      
+      
+      if(localStorage.getItem("lycee") == "none"){
+          //sinon on affiche un message et on met le select sur "none"
+          console.log("Pas de lycée enregistré");
+            document.getElementById("none").setAttribute("selected", "selected");
+       
+      }else{
+          
+          if(localStorage.getItem("lycee") != null) {
+              //Si oui, on récupère l'entrée et on la met dans le select
+              console.log("Lycee trouvé");
+              document.getElementById(localStorage.getItem("lycee")+"-lycee").setAttribute("selected", "selected");
+           
+          }else{
+              //sinon on affiche un message et on met le select sur "none"
+              console.log("Pas de lycée enregistré");
+                document.getElementById("none").setAttribute("selected", "selected");
+                
+          }
+        }
+      
+      
+      
+      ////////////CLASSE/////////////////////
+      //Renvoie si le navigateur à une entrée "classe" dans le stockage local
+      
+      if (localStorage.getItem("classe") === "noneclass") {
+          //sinon on affiche un message et on met le select sur "none"
+          console.log("Pas de classe trouvé");
+          document.getElementById("noneclass").setAttribute("selected", "selected");
+       
+      }else{
+      if (localStorage.getItem("classe") != null) {
+          
+        //Si oui, on récupère l'entrée et on la met dans le select
+        document.getElementById(localStorage.getItem("classe")+"-class").setAttribute("selected", "selected");
+        console.log("Classe  trouvé");
+      }else{
+          
+        //Si non on affiche un message
+        console.log("Pas de classe trouvé") 
+        document.getElementById("noneclass").setAttribute("selected", "selected");
+         
+      }}
+      
+      //Fonction qui enregistre le lycée dans le stockage local
+      function saveLycee(){
+        //On récupère la valeur du select
+        var lycee = document.getElementById("lycee").value;
+        //On enregistre la valeur dans le stockage local
+        localStorage.setItem("lycee", lycee);
+        console.log("Lycee enregistré");
+        location.reload();
+      }
+      
+      //Fonction qui enregistre la classe dans le stockage local
+      function saveClasse(){
+        //On récupère la valeur du select
+        var classe = document.getElementById("classe").value;
+        //On enregistre la valeur dans le stockage local
+        localStorage.setItem("classe", classe);
+        console.log("Classe enregistré");
+        location.reload();
+      }</script>
+</body>
+</html>
